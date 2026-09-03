@@ -50,7 +50,7 @@ flowchart TD
 ### C. Resilient Delivery, Exponential Backoff & DLQ
 - **Decoupled Workers**: Stateless Python worker processes consume jobs independently via Redis Stream Consumer Groups (`XREADGROUP`).
 - **Audit Logging**: Every single delivery attempt is recorded immutably in `delivery_attempts` with error tracebacks.
-- **Exponential Backoff ($2^{\text{attempt\_count}}$)**: Transient failures (e.g. downstream network timeouts) schedule retries with delays of 2s, 4s, 8s in a Redis Sorted Set (`delayed_jobs`). A background scheduler loop polls mature jobs and re-enqueues them.
+- **Exponential Backoff** : Transient failures (e.g. downstream network timeouts) schedule retries with delays of 2s, 4s, 8s in a Redis Sorted Set (`delayed_jobs`). A background scheduler loop polls mature jobs and re-enqueues them.
 - **Dead-Letter Queue (DLQ)**: Permanently failing jobs reaching `max_attempts` (3) transition status to `failed` and are parked in `dlq_stream` for inspection/alerting.
 
 ### D. Real-Time Observability Dashboard
