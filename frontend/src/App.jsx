@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Zap, Send, RefreshCw, Key } from 'lucide-react';
+import { RefreshCw, Send } from 'lucide-react';
 import { useWebSocket } from './hooks/useWebSocket';
+import Navbar from './components/Navbar';
+import LandingPage from './components/LandingPage';
 import MetricsBar from './components/MetricsBar';
 import NotificationTable from './components/NotificationTable';
 import SendNotificationModal from './components/SendNotificationModal';
+import ApiKeyGeneratorModal from './components/ApiKeyGeneratorModal';
 
 const API_BASE_URL = 'http://localhost:8000';
 const WS_URL = 'ws://localhost:8000/ws/notifications';
 
 export default function App() {
+  const [activeView, setActiveView] = useState('landing'); // 'landing' | 'dashboard'
   const [apiKey, setApiKey] = useState(localStorage.getItem('NDS_API_KEY') || 'nds_demo_key_12345');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [keyModalOpen, setKeyModalOpen] = useState(false);
 
   // Save API key locally
   const handleApiKeyChange = (val) => {
@@ -79,8 +84,16 @@ export default function App() {
   }, [apiKey]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (activeView === 'dashboard') {
+      fetchNotifications();
+    }
+  }, [activeView, fetchNotifications]);
+
+  // Handle key generated from modal
+  const handleKeyGenerated = (newKey) => {
+    handleApiKeyChange(newKey);
+    setActiveView('dashboard');
+  };
 
   // Dispatch new notification request via API
   const handleSendNotification = async (payload) => {
@@ -104,73 +117,75 @@ export default function App() {
     }
 
     const data = await res.json();
-    
-    // Optimistic UI update or refresh
     fetchNotifications();
     return data;
   };
 
   return (
     <div className="container">
-      <header>
-        <div className="logo-group">
-          <div className="logo-icon">
-            <Zap size={22} color="#fff" />
+      <Navbar
+        activeView={activeView}
+        setActiveView={setActiveView}
+        onOpenKeyModal={() => setKeyModalOpen(true)}
+        isConnected={isConnected}
+      />
+
+      {activeView === 'landing' ? (
+        <LandingPage
+          onGoToDashboard={() => setActiveView('dashboard')}
+          onOpenKeyModal={() => setKeyModalOpen(true)}
+          apiKey={apiKey}
+        />
+      ) : (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div className="api-key-input-group" style={{ maxWidth: '420px', width: '100%' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginRight: '0.5rem', fontWeight: 600 }}>
+                ACTIVE KEY:
+              </span>
+              <input
+                type="password"
+                placeholder="X-API-Key"
+                value={apiKey}
+                onChange={(e) => handleApiKeyChange(e.target.value)}
+              />
+            </div>
+
+            <button className="btn-primary" onClick={() => setSendModalOpen(true)}>
+              <Send size={16} />
+              Send Test Notification
+            </button>
           </div>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
-              Notification Engine
-            </h1>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Async • Idempotent • Rate Limited
-            </span>
+
+          <MetricsBar notifications={notifications} />
+
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Real-time Delivery Pipeline</h2>
+              <button
+                onClick={fetchNotifications}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}
+              >
+                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                Refresh
+              </button>
+            </div>
+
+            <NotificationTable notifications={notifications} />
           </div>
         </div>
-
-        <div className="header-actions">
-          <div className="ws-status-pill">
-            <div className={`ws-dot ${isConnected ? 'connected' : 'disconnected'}`} />
-            {isConnected ? 'Live WebSocket Connected' : 'Reconnecting...'}
-          </div>
-
-          <div className="api-key-input-group">
-            <Key size={15} color="var(--text-muted)" style={{ marginRight: '0.4rem' }} />
-            <input
-              type="password"
-              placeholder="X-API-Key"
-              value={apiKey}
-              onChange={(e) => handleApiKeyChange(e.target.value)}
-            />
-          </div>
-
-          <button className="btn-primary" onClick={() => setModalOpen(true)}>
-            <Send size={16} />
-            Send Test Notification
-          </button>
-        </div>
-      </header>
-
-      <MetricsBar notifications={notifications} />
-
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1.05rem', fontWeight: 600 }}>Real-time Delivery Pipeline</h2>
-          <button
-            onClick={fetchNotifications}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.85rem' }}
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
-        </div>
-
-        <NotificationTable notifications={notifications} />
-      </div>
+      )}
 
       <SendNotificationModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={sendModalOpen}
+        onClose={() => setSendModalOpen(false)}
         onSend={handleSendNotification}
+      />
+
+      <ApiKeyGeneratorModal
+        isOpen={keyModalOpen}
+        onClose={() => setKeyModalOpen(false)}
+        onKeyGenerated={handleKeyGenerated}
       />
     </div>
   );
