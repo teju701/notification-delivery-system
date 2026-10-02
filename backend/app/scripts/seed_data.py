@@ -4,11 +4,14 @@ import asyncpg
 from sqlalchemy import select
 from app.core.config import settings
 from app.core.database import engine, AsyncSessionLocal, Base
-from app.core.security import generate_api_key, hash_api_key
+from app.core.security import hash_api_key
 from app.models.tenant import Tenant
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
+
+# Fixed development seed API key for reliable local testing
+FIXED_DEMO_API_KEY = "nds_demo_key_12345"
 
 
 async def ensure_database_exists():
@@ -17,7 +20,6 @@ async def ensure_database_exists():
     If it does not exist, connects to default 'postgres' database and creates it.
     """
     try:
-        # Try connecting to the default database to check/create target database
         sys_conn = await asyncpg.connect(
             user=settings.POSTGRES_USER,
             password=settings.POSTGRES_PASSWORD,
@@ -41,8 +43,7 @@ async def ensure_database_exists():
 
 async def seed_demo_tenant():
     """
-    Creates tables if missing and seeds a demo tenant with a generated API key.
-    Prints the raw API Key to console for testing.
+    Creates tables if missing and seeds a demo tenant with a fixed, static API key for testing.
     """
     await ensure_database_exists()
 
@@ -55,23 +56,21 @@ async def seed_demo_tenant():
         result = await db.execute(stmt)
         existing_tenant = result.scalar_one_or_none()
 
+        key_hash = hash_api_key(FIXED_DEMO_API_KEY)
+
         if existing_tenant:
-            logger.info("Demo Tenant already exists in database.")
-            # Generate a new API Key for testing
-            raw_key, key_hash = generate_api_key(prefix="nds_demo_")
             existing_tenant.api_key_hash = key_hash
             await db.commit()
             print("\n" + "=" * 60)
-            print(" DEMO TENANT UPDATED SUCCESSFULLY")
+            print(" DEMO TENANT ACTIVE & READY")
             print(f" Tenant ID:       {existing_tenant.id}")
             print(f" Tenant Name:     {existing_tenant.name}")
             print(f" Tenant RPS:      {existing_tenant.rate_limit_rps}")
-            print(f" X-API-Key:       {raw_key}")
+            print(f" X-API-Key:       {FIXED_DEMO_API_KEY}")
             print("=" * 60 + "\n")
             return
 
         # Create new Demo Tenant
-        raw_key, key_hash = generate_api_key(prefix="nds_demo_")
         demo_tenant = Tenant(
             name="Demo Tenant",
             api_key_hash=key_hash,
@@ -86,7 +85,7 @@ async def seed_demo_tenant():
         print(f" Tenant ID:       {demo_tenant.id}")
         print(f" Tenant Name:     {demo_tenant.name}")
         print(f" Tenant RPS:      {demo_tenant.rate_limit_rps}")
-        print(f" X-API-Key:       {raw_key}")
+        print(f" X-API-Key:       {FIXED_DEMO_API_KEY}")
         print(" Use this X-API-Key in your HTTP requests / React Dashboard!")
         print("=" * 60 + "\n")
 

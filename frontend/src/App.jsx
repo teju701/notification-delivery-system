@@ -9,7 +9,7 @@ const API_BASE_URL = 'http://localhost:8000';
 const WS_URL = 'ws://localhost:8000/ws/notifications';
 
 export default function App() {
-  const [apiKey, setApiKey] = useState(localStorage.getItem('NDS_API_KEY') || 'nds_demo_key');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('NDS_API_KEY') || 'nds_demo_key_12345');
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
