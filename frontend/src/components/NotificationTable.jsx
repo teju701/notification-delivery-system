@@ -11,8 +11,8 @@ export default function NotificationTable({ notifications, onSelectNotification 
 
   if (!notifications.length) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-        No notification requests recorded yet. Click <strong>"Send Test Notification"</strong> above to dispatch one!
+      <div style={{ textAlign: 'center', padding: '3.5rem 1rem', color: 'var(--text-muted)' }}>
+        No notification requests recorded yet. Click <strong style={{ color: 'var(--primary-accent)' }}>"Send Test Notification"</strong> above to dispatch one!
       </div>
     );
   }
@@ -42,11 +42,11 @@ export default function NotificationTable({ notifications, onSelectNotification 
                 <tr onClick={() => hasAttempts && toggleExpand(item.id)} style={{ cursor: hasAttempts ? 'pointer' : 'default' }}>
                   <td>
                     {hasAttempts && (
-                      isExpanded ? <ChevronDown size={16} color="var(--text-muted)" /> : <ChevronRight size={16} color="var(--text-muted)" />
+                      isExpanded ? <ChevronDown size={16} color="var(--primary-accent)" /> : <ChevronRight size={16} color="var(--text-muted)" />
                     )}
                   </td>
                   <td className="mono">{item.id.slice(0, 8)}...</td>
-                  <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.recipient}</td>
+                  <td style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{item.recipient}</td>
                   <td className="mono" style={{ textTransform: 'uppercase' }}>{item.channel}</td>
                   <td>
                     <StatusBadge status={item.status} />
@@ -60,11 +60,11 @@ export default function NotificationTable({ notifications, onSelectNotification 
 
                 {isExpanded && hasAttempts && (
                   <tr>
-                    <td colSpan="8" style={{ background: 'rgba(0, 0, 0, 0.25)', padding: '1rem 1.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontSize: '0.85rem', color: 'var(--primary-accent)', fontWeight: 600 }}>
+                    <td colSpan="8" style={{ background: '#f8fafc', padding: '1.25rem 1.5rem', borderLeft: '3px solid var(--primary-accent)', borderRadius: '0 0 10px 10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem', fontSize: '0.85rem', color: 'var(--primary-accent)', fontWeight: 600 }}>
                         <History size={16} /> Audit Trail & Delivery Attempts ({item.delivery_attempts.length})
                       </div>
-                      <table style={{ margin: 0, background: 'transparent' }}>
+                      <table style={{ margin: 0, background: '#ffffff', borderRadius: '10px', border: '1px solid var(--bg-card-border)', overflow: 'hidden' }}>
                         <thead>
                           <tr>
                             <th>Attempt #</th>

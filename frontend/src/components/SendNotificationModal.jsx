@@ -42,14 +42,14 @@ export default function SendNotificationModal({ isOpen, onClose, onSend }) {
     <div className="modal-backdrop">
       <div className="modal-content">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Simulate Notification Dispatch</h2>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>Simulate Notification Dispatch</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
             <X size={20} />
           </button>
         </div>
 
         {error && (
-          <div style={{ padding: '0.75rem 1rem', background: 'var(--status-failed-bg)', border: '1px solid var(--status-failed)', borderRadius: '8px', color: 'var(--status-failed)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+          <div style={{ padding: '0.75rem 1rem', background: 'var(--status-failed-bg)', border: '1px solid var(--status-failed-border)', borderRadius: '10px', color: 'var(--status-failed)', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
             {error}
           </div>
         )}
@@ -98,20 +98,20 @@ export default function SendNotificationModal({ isOpen, onClose, onSend }) {
             <button
               type="button"
               onClick={() => setIdempotencyKey(`test-key-${Math.floor(Math.random() * 10000)}`)}
-              style={{ background: 'none', border: 'none', color: 'var(--primary-accent)', fontSize: '0.75rem', cursor: 'pointer', marginTop: '0.25rem' }}
+              style={{ background: 'none', border: 'none', color: 'var(--primary-accent)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', marginTop: '0.3rem' }}
             >
               Generate New Key
             </button>
           </div>
 
-          <div className="form-group" style={{ background: 'rgba(245, 158, 11, 0.08)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+          <div className="form-group" style={{ background: '#fffbeb', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #fcd34d' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', margin: 0 }}>
               <input
                 type="checkbox"
                 checked={simulateFail}
                 onChange={(e) => setSimulateFail(e.target.checked)}
               />
-              <span style={{ fontSize: '0.85rem', color: 'var(--status-retrying)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.83rem', color: '#b45309', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <AlertTriangle size={15} /> Simulate Delivery Failure (Test Exponential Backoff & DLQ)
               </span>
             </label>

@@ -16,19 +16,19 @@ export default function MetricsBar({ notifications }) {
         <span className="metric-title">Total Requests</span>
         <span className="metric-value">{notifications.length}</span>
       </div>
-      <div className="metric-card" style={{ borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+      <div className="metric-card" style={{ borderLeft: '4px solid var(--status-delivered)' }}>
         <span className="metric-title" style={{ color: 'var(--status-delivered)' }}>Delivered</span>
         <span className="metric-value" style={{ color: 'var(--status-delivered)' }}>{counts.delivered}</span>
       </div>
-      <div className="metric-card" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
+      <div className="metric-card" style={{ borderLeft: '4px solid var(--status-retrying)' }}>
         <span className="metric-title" style={{ color: 'var(--status-retrying)' }}>Retrying</span>
         <span className="metric-value" style={{ color: 'var(--status-retrying)' }}>{counts.retrying}</span>
       </div>
-      <div className="metric-card" style={{ borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+      <div className="metric-card" style={{ borderLeft: '4px solid var(--status-failed)' }}>
         <span className="metric-title" style={{ color: 'var(--status-failed)' }}>Failed (DLQ)</span>
         <span className="metric-value" style={{ color: 'var(--status-failed)' }}>{counts.failed}</span>
       </div>
-      <div className="metric-card" style={{ borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+      <div className="metric-card" style={{ borderLeft: '4px solid var(--status-processing)' }}>
         <span className="metric-title" style={{ color: 'var(--status-processing)' }}>Queued / In-Flight</span>
         <span className="metric-value" style={{ color: 'var(--status-processing)' }}>{counts.queued + counts.processing}</span>
       </div>
